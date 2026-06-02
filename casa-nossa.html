@@ -184,14 +184,43 @@ body{font-family:'DM Sans',sans-serif;color:var(--text)}
         <button onclick="exportData()" style="margin-left:auto;padding:7px 12px;border-radius:8px;border:1px solid var(--border2);background:none;font-size:13px;cursor:pointer;color:var(--text2);font-family:'DM Sans',sans-serif;display:flex;align-items:center;gap:5px"><i class="ti ti-download" style="font-size:15px"></i>Backup</button>
       </div>
       <div class="tabs">
-        <button class="tab on" id="ft0" onclick="ftab(0)">Movimentações</button>
+        <button class="tab on" id="ft4" onclick="ftab(4)">Visão geral</button>
+        <button class="tab" id="ft0" onclick="ftab(0)">Movimentações</button>
         <button class="tab" id="ft1" onclick="ftab(1)">Contas fixas</button>
         <button class="tab" id="ft3" onclick="ftab(3)">Parcelamentos</button>
         <button class="tab" id="ft2" onclick="ftab(2)">Histórico</button>
       </div>
 
+      <!-- TAB 4: VISÃO GERAL -->
+      <div id="ftab4">
+        <div style="height:12px"></div>
+        <!-- SALDO DO MÊS -->
+        <div style="margin:0 16px 12px;background:var(--c1bg);border-radius:var(--radius-sm);padding:16px">
+          <div style="font-size:11px;font-weight:500;color:var(--c1);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px"><i class="ti ti-chart-pie" style="font-size:13px;vertical-align:-1px;margin-right:4px"></i>Resumo do mês</div>
+          <div id="vg-metrics" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px"></div>
+        </div>
+        <!-- CONTAS A PAGAR -->
+        <div class="card">
+          <div class="card-title" style="justify-content:space-between">
+            <span><i class="ti ti-calendar-due" aria-hidden="true"></i>Contas a pagar este mês</span>
+            <span id="vg-pagar-badge" style="font-size:12px;font-weight:400"></span>
+          </div>
+          <div id="vg-pagar"></div>
+        </div>
+        <!-- PARCELAMENTOS DO MÊS -->
+        <div class="card">
+          <div class="card-title"><i class="ti ti-credit-card" aria-hidden="true"></i>Parcelas deste mês</div>
+          <div id="vg-parcelas"></div>
+        </div>
+        <!-- MOVIMENTAÇÕES RECENTES -->
+        <div class="card">
+          <div class="card-title"><i class="ti ti-list" aria-hidden="true"></i>Últimas movimentações</div>
+          <div id="vg-movs"></div>
+        </div>
+      </div>
+
       <!-- TAB 0: MOVIMENTAÇÕES -->
-      <div id="ftab0">
+      <div id="ftab0" style="display:none">
         <div style="height:12px"></div>
         <div class="metrics" id="fin-metrics"></div>
         <div class="card">
@@ -509,7 +538,7 @@ document.getElementById('pg-home').style.display='';
 
 // FIN TABS
 function ftab(n){
-  [0,1,2,3].forEach(i=>{
+  [0,1,2,3,4].forEach(i=>{
     const el=document.getElementById('ftab'+i);
     const btn=document.getElementById('ft'+i);
     if(el)el.style.display=i===n?'':'none';
@@ -519,6 +548,7 @@ function ftab(n){
   if(n===1){buildCatSelect('cf-cat');renderCF();}
   if(n===2)renderHist();
   if(n===3){buildCatSelect('pc-cat');renderPC();}
+  if(n===4)renderVG();
 }
 function ctab(n){
   [0,1].forEach(i=>{
@@ -981,7 +1011,145 @@ function pagarParcela(pcId,idx){
 
 function delPC(id){PC=PC.filter(x=>x.id!==id);savePC();renderPC();}
 
-const renders={financeiro:()=>{buildCatSelect('fin-cat');renderFin();},compras:renderSH,agenda:renderAgenda,recados:renderRecados,metas:renderMetas};
+// VISÃO GERAL
+function renderVG(){
+  const hoje=new Date();
+  const mk=hoje.toISOString().slice(0,7);
+  const dh=hoje.getDate();
+
+  // MÉTRICAS DO MÊS
+  const mesInc=TR.filter(t=>t.date.slice(0,7)===mk&&t.type==='income').reduce((a,t)=>a+t.val,0);
+  const mesExp=TR.filter(t=>t.date.slice(0,7)===mk&&t.type==='expense').reduce((a,t)=>a+t.val,0);
+  const mesBal=mesInc-mesExp;
+  document.getElementById('vg-metrics').innerHTML=`
+    <div style="background:rgba(255,255,255,0.5);border-radius:10px;padding:10px;text-align:center">
+      <div style="font-size:11px;color:var(--c1);margin-bottom:3px">Receitas</div>
+      <div style="font-size:15px;font-weight:500;color:var(--c2)">${fmt(mesInc)}</div>
+    </div>
+    <div style="background:rgba(255,255,255,0.5);border-radius:10px;padding:10px;text-align:center">
+      <div style="font-size:11px;color:var(--c1);margin-bottom:3px">Despesas</div>
+      <div style="font-size:15px;font-weight:500;color:var(--c5)">${fmt(mesExp)}</div>
+    </div>
+    <div style="background:rgba(255,255,255,0.5);border-radius:10px;padding:10px;text-align:center">
+      <div style="font-size:11px;color:var(--c1);margin-bottom:3px">Saldo</div>
+      <div style="font-size:15px;font-weight:500;color:${mesBal>=0?'var(--c2)':'var(--c5)'}">${fmt(mesBal)}</div>
+    </div>`;
+
+  // CONTAS FIXAS A PAGAR
+  const cfMes=CF.filter(c=>{
+    if(c.freq==='anual'){
+      // anual: só aparece no mês certo
+      const [sy,sm]=c.start?(c.start.split('-').map(Number)):[0,0];
+      return sm===(hoje.getMonth()+1);
+    }
+    return true; // mensais sempre aparecem
+  });
+  const pagas=cfMes.filter(c=>c.pago&&c.pago[mk]).length;
+  const pendentes=cfMes.filter(c=>!(c.pago&&c.pago[mk])).length;
+  const totalPagar=cfMes.filter(c=>!(c.pago&&c.pago[mk])).reduce((a,c)=>a+c.val,0);
+
+  document.getElementById('vg-pagar-badge').innerHTML=
+    `<span class="badge ${pendentes>0?'br':'bg'}">${pendentes} pendente${pendentes!==1?'s':''} · ${fmt(totalPagar)}</span>`;
+
+  const elP=document.getElementById('vg-pagar');
+  if(!cfMes.length){
+    elP.innerHTML='<div class="empty" style="padding:16px"><p>Nenhuma conta fixa cadastrada</p></div>';
+  } else {
+    // ordenar: não pagas primeiro, depois por dia
+    const sorted=[...cfMes].sort((a,b)=>{
+      const ap=!!(a.pago&&a.pago[mk]);
+      const bp=!!(b.pago&&b.pago[mk]);
+      if(ap!==bp)return ap?1:-1;
+      return a.day-b.day;
+    });
+    elP.innerHTML=sorted.map(c=>{
+      const ip=!!(c.pago&&c.pago[mk]);
+      const dias=c.day-dh;
+      let badge='';
+      if(!ip){
+        if(dias<0)badge='<span class="badge br" style="font-size:10px">Vencida</span>';
+        else if(dias===0)badge='<span class="badge br" style="font-size:10px">Hoje!</span>';
+        else if(dias<=3)badge=`<span class="badge ba" style="font-size:10px">${dias}d</span>`;
+      }
+      return`<div class="item">
+        <div style="width:7px;height:7px;border-radius:50%;background:${ip?'var(--c2)':'var(--c5)'};flex-shrink:0;margin-top:2px"></div>
+        <div class="im">
+          <div class="in" style="display:flex;align-items:center;gap:6px">${c.desc} ${badge}</div>
+          <div class="is">Dia ${c.day} · ${c.cat}</div>
+        </div>
+        <span style="font-size:13px;font-weight:500;margin-right:8px;white-space:nowrap;${ip?'color:var(--text3);text-decoration:line-through':''}">${fmt(c.val)}</span>
+        <button class="pbtn ${ip?'on':''}" onclick="togPagoVG('${c.id}')">${ip?'✓':'Pagar'}</button>
+      </div>`;
+    }).join('');
+  }
+
+  // PARCELAS DO MÊS
+  const elPC=document.getElementById('vg-parcelas');
+  const parcMes=[];
+  (PC||[]).forEach(p=>{
+    const parc=p.parcelas.find(x=>x.date.slice(0,7)===mk);
+    if(parc)parcMes.push({p,parc});
+  });
+  if(!parcMes.length){
+    elPC.innerHTML='<div style="font-size:13px;color:var(--text3);padding:8px 0">Nenhuma parcela este mês.</div>';
+  } else {
+    elPC.innerHTML=parcMes.map(({p,parc})=>{
+      const dias=parseInt(parc.date.slice(8,10))-dh;
+      let badge='';
+      if(!parc.pago){
+        if(dias<0)badge='<span class="badge br" style="font-size:10px">Vencida</span>';
+        else if(dias===0)badge='<span class="badge br" style="font-size:10px">Hoje!</span>';
+        else if(dias<=3)badge=`<span class="badge ba" style="font-size:10px">${dias}d</span>`;
+      }
+      return`<div class="item">
+        <div style="width:7px;height:7px;border-radius:50%;background:${parc.pago?'var(--c2)':'var(--c3)'};flex-shrink:0;margin-top:2px"></div>
+        <div class="im">
+          <div class="in" style="display:flex;align-items:center;gap:6px">${p.desc} ${badge}</div>
+          <div class="is">Parcela ${parc.idx}/${p.n} · ${parc.date}</div>
+        </div>
+        <span style="font-size:13px;font-weight:500;margin-right:8px;white-space:nowrap;${parc.pago?'color:var(--text3);text-decoration:line-through':''}">${fmt(p.parcVal)}</span>
+        ${!parc.pago?`<button class="pbtn" onclick="pagarParcelaVG('${p.id}','${parc.idx}')">Pagar</button>`:'<span class="badge bg">✓</span>'}
+      </div>`;
+    }).join('');
+  }
+
+  // ÚLTIMAS MOVIMENTAÇÕES
+  const elM=document.getElementById('vg-movs');
+  const recentes=[...TR].sort((a,b)=>b.date.localeCompare(a.date)).slice(0,8);
+  if(!recentes.length){
+    elM.innerHTML='<div class="empty" style="padding:16px"><p>Nenhuma movimentação</p></div>';
+  } else {
+    elM.innerHTML=recentes.map(t=>`<div class="item">
+      <div style="width:7px;height:7px;border-radius:50%;background:${t.type==='income'?'var(--c2)':'var(--c5)'};flex-shrink:0;margin-top:2px"></div>
+      <div class="im">
+        <div class="in">${t.desc}</div>
+        <div class="is">${t.date} · ${t.cat}</div>
+      </div>
+      <span class="badge ${t.type==='income'?'bg':'br'}">${t.type==='income'?'+':'-'}${fmt(t.val)}</span>
+    </div>`).join('');
+  }
+}
+
+function togPagoVG(id){
+  const mk=new Date().toISOString().slice(0,7);
+  const c=CF.find(x=>x.id===id);
+  if(!c)return;
+  if(!c.pago)c.pago={};
+  c.pago[mk]=!c.pago[mk];
+  save();renderVG();
+}
+
+function pagarParcelaVG(pcId,idx){
+  const p=PC.find(x=>x.id===pcId);
+  if(!p)return;
+  const parc=p.parcelas.find(x=>x.idx===parseInt(idx));
+  if(!parc)return;
+  parc.pago=true;
+  TR.push({id:uid(),desc:`[Parcela ${parc.idx}/${p.n}] ${p.desc}`,val:p.parcVal,type:'expense',cat:p.cat,who:'casa',date:parc.date});
+  save();savePC();renderVG();
+}
+
+const renders={financeiro:()=>{buildCatSelect('fin-cat');ftab(4);},compras:renderSH,agenda:renderAgenda,recados:renderRecados,metas:renderMetas};
 
 // INIT
 const tdN=new Date();
