@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Casa Nossa">
+<meta name="theme-color" content="#f7f3ee">
+<title>Casa Nossa</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,500;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+<style>
+:root{
+  --bg:#f7f3ee;--surface:#ffffff;--surface2:#f0ebe3;--border:rgba(80,55,20,0.13);--border2:rgba(80,55,20,0.22);
+  --text:#221608;--text2:#7a6545;--text3:#b8a882;
+  --c1:#185FA5;--c1bg:#e6f1fb;--c1light:#b5d4f4;
+  --c2:#0F6E56;--c2bg:#e1f5ee;--c2light:#9FE1CB;
+  --c3:#7F77DD;--c3bg:#EEEDFE;--c3light:#CECBF6;
+  --c4:#BA7517;--c4bg:#FAEEDA;--c4light:#FAC775;
+  --c5:#A32D2D;--c5bg:#FCEBEB;--c5light:#F7C1C1;
+  --radius:18px;--radius-sm:12px;--nav:60px;
+}
+@media(prefers-color-scheme:dark){
+  :root{
+    --bg:#18130c;--surface:#211a10;--surface2:#2a2015;--border:rgba(255,220,150,0.1);--border2:rgba(255,220,150,0.18);
+    --text:#f5ead8;--text2:#9a8055;--text3:#5a4830;
+    --c1:#378ADD;--c1bg:#042C53;--c1light:#0C447C;
+    --c2:#1D9E75;--c2bg:#04342C;--c2light:#085041;
+    --c3:#AFA9EC;--c3bg:#26215C;--c3light:#3C3489;
+    --c4:#EF9F27;--c4bg:#412402;--c4light:#633806;
+    --c5:#E24B4A;--c5bg:#501313;--c5light:#791F1F;
+  }
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden;background:var(--bg)}
+body{font-family:'DM Sans',sans-serif;color:var(--text)}
+
+.app{height:100%;display:flex;flex-direction:column;overflow:hidden}
+
+/* HEADER */
+.header{flex-shrink:0;padding:20px 20px 0;display:flex;align-items:flex-start;justify-content:space-between}
+.logo{font-family:'Lora',serif;font-size:26px;font-weight:600;color:var(--text);line-height:1.1}
+.logo em{font-style:italic;font-weight:500}
+.hdate{font-size:12px;color:var(--text2);margin-top:4px;font-weight:400;letter-spacing:.1px}
+.avatars{display:flex;gap:6px;padding-top:4px}
+.av{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;border:1.5px solid}
+.av1{background:#e8e0f5;color:#3C3489;border-color:#AFA9EC}
+.av2{background:#d8f0e5;color:#085041;border-color:#5DCAA5}
+
+/* SCROLL AREA */
+.scroll{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch}
+
+/* HOME — LINK TREE */
+.home{padding:24px 20px 20px;display:flex;flex-direction:column;gap:12px}
+
+.tree-btn{
+  display:flex;align-items:center;gap:16px;
+  padding:20px 20px;border-radius:var(--radius);
+  border:none;cursor:pointer;width:100%;
+  font-family:'DM Sans',sans-serif;text-align:left;
+  transition:transform .12s,opacity .12s;
+  position:relative;overflow:hidden;
+}
+.tree-btn:active{transform:scale(0.97);opacity:.9}
+.tree-btn .icon-wrap{width:46px;height:46px;border-radius:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.tree-btn .icon-wrap i{font-size:24px}
+.tree-btn .btn-label{font-size:17px;font-weight:500;line-height:1.2}
+.tree-btn .btn-sub{font-size:12px;margin-top:3px;font-weight:400;opacity:.75}
+.tree-btn .arrow{margin-left:auto;font-size:20px;opacity:.5;flex-shrink:0}
+
+.btn-blue{background:var(--c1bg);color:var(--c1)}
+.btn-blue .icon-wrap{background:var(--c1light)}
+.btn-green{background:var(--c2bg);color:var(--c2)}
+.btn-green .icon-wrap{background:var(--c2light)}
+.btn-purple{background:var(--c3bg);color:var(--c3)}
+.btn-purple .icon-wrap{background:var(--c3light)}
+.btn-amber{background:var(--c4bg);color:var(--c4)}
+.btn-amber .icon-wrap{background:var(--c4light)}
+.btn-red{background:var(--c5bg);color:var(--c5)}
+.btn-red .icon-wrap{background:var(--c5light)}
+
+/* SCREEN */
+.screen{display:none;padding:0 0 80px}
+.screen.active{display:block}
+
+/* SCREEN HEADER */
+.screen-head{
+  display:flex;align-items:center;gap:10px;
+  padding:16px 20px;position:sticky;top:0;
+  background:var(--bg);z-index:10;
+  border-bottom:1px solid var(--border);
+}
+.back-btn{width:36px;height:36px;border-radius:50%;border:1px solid var(--border2);background:var(--surface);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
+.back-btn i{font-size:18px;color:var(--text2)}
+.screen-title{font-family:'Lora',serif;font-size:18px;font-weight:600;color:var(--text)}
+
+/* TABS inside screen */
+.tabs{display:flex;gap:0;padding:12px 20px;border-bottom:1px solid var(--border)}
+.tab{padding:8px 16px;border-radius:99px;font-size:13px;font-weight:500;cursor:pointer;border:none;background:none;color:var(--text2);font-family:'DM Sans',sans-serif}
+.tab.on{background:var(--surface);color:var(--text);border:1px solid var(--border2)}
+
+/* CARD */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px;margin:0 16px 12px}
+.card-title{font-size:14px;font-weight:500;color:var(--text2);margin-bottom:14px;display:flex;align-items:center;gap:6px;text-transform:uppercase;letter-spacing:.5px}
+.card-title i{font-size:16px}
+.pad{padding:12px 16px 0}
+
+/* METRICS */
+.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:0 16px 12px}
+.metric{background:var(--surface2);border-radius:10px;padding:12px 10px;text-align:center}
+.ml{font-size:11px;color:var(--text2);margin-bottom:3px}
+.mv{font-size:15px;font-weight:500}
+.mv.g{color:var(--c2)}.mv.r{color:var(--c5)}
+
+/* FORM */
+.field{display:flex;flex-direction:column;gap:5px;margin-bottom:10px}
+.field label{font-size:12px;color:var(--text2);font-weight:500;letter-spacing:.2px}
+.field input,.field select,.field textarea{
+  background:var(--surface2);border:1px solid var(--border2);
+  border-radius:10px;padding:11px 14px;font-size:15px;
+  color:var(--text);font-family:'DM Sans',sans-serif;width:100%;
+  -webkit-appearance:none;appearance:none;
+}
+.field textarea{resize:vertical;min-height:80px}
+.r2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.r3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.btn-go{
+  width:100%;padding:14px;border:none;border-radius:12px;
+  font-size:15px;font-weight:500;font-family:'DM Sans',sans-serif;
+  cursor:pointer;margin-top:4px;
+}
+.btn-go:active{opacity:.85}
+
+/* LIST */
+.item{display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid var(--border)}
+.item:last-child{border-bottom:none}
+.im{flex:1;min-width:0}
+.in{font-size:14px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.is{font-size:12px;color:var(--text2);margin-top:2px}
+.delbtn{padding:6px;border:none;background:none;cursor:pointer;color:var(--text3);border-radius:8px;flex-shrink:0}
+.delbtn:active{color:var(--c5)}
+.badge{display:inline-block;padding:2px 8px;border-radius:99px;font-size:11px;font-weight:500}
+.bg{background:var(--c2bg);color:var(--c2)}.br{background:var(--c5bg);color:var(--c5)}
+.ba{background:var(--c4bg);color:var(--c4)}.bgr{background:var(--surface2);color:var(--text2)}
+
+/* PROGRESS */
+.prog{background:var(--surface2);border-radius:99px;height:7px;overflow:hidden;margin-top:8px}
+.pf{height:100%;border-radius:99px;transition:width .3s}
+.pg{background:var(--c2)}.pb{background:var(--c1)}.pa{background:var(--c4)}.pr{background:var(--c5)}
+
+/* AGENDA */
+.dlabel{font-size:11px;font-weight:500;color:var(--text2);text-transform:uppercase;letter-spacing:.6px;padding:16px 16px 8px}
+.ev{display:flex;gap:10px;padding:10px 14px;border-radius:10px;border:1px solid var(--border);margin:0 16px 6px;background:var(--surface)}
+.dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;margin-top:4px}
+.dp{background:var(--c3)}.dc{background:var(--c2)}.ds{background:var(--c5)}.de{background:var(--c1)}
+
+/* CHK */
+.chk{width:24px;height:24px;border-radius:50%;border:1.5px solid var(--border2);background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s}
+.chk.on{background:var(--c2bg);border-color:var(--c2);color:var(--c2)}
+
+/* PAGO BTN */
+.pbtn{padding:6px 12px;border-radius:8px;border:1px solid var(--border2);background:none;font-size:12px;font-family:'DM Sans',sans-serif;cursor:pointer;color:var(--text2);white-space:nowrap}
+.pbtn.on{background:var(--c2bg);border-color:var(--c2);color:var(--c2)}
+
+/* META */
+.meta-c{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;margin:0 16px 10px}
+
+/* NOTE */
+.note{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;margin:0 16px 10px}
+
+/* EMPTY */
+.empty{text-align:center;padding:40px 20px;color:var(--text3)}
+.empty i{font-size:38px;display:block;margin-bottom:8px}
+.empty p{font-size:14px}
+
+/* BOTTOM NAV */
+.bnav{
+  position:fixed;bottom:0;left:0;right:0;height:var(--nav);
+  background:var(--surface);border-top:1px solid var(--border);
+  display:flex;align-items:center;padding:0 4px;
+  padding-bottom:env(safe-area-inset-bottom);
+}
+.ni{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 0;cursor:pointer;color:var(--text3);border:none;background:none;font-family:'DM Sans',sans-serif;transition:color .12s}
+.ni.on{color:var(--c1)}
+.ni i{font-size:22px}
+.ni span{font-size:10px;font-weight:500}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="header">
+    <div>
+      <div class="logo">Casa <em>nossa</em></div>
+      <div class="hdate" id="hdate"></div>
+    </div>
+    <div class="avatars">
+      <div class="av av1">P1</div>
+      <div class="av av2">P2</div>
+    </div>
+  </div>
+
+  <div class="scroll" id="scroll-area">
+
+    <!-- HOME -->
+    <div id="pg-home" class="home">
+      <button class="tree-btn btn-blue" onclick="goto('financeiro')">
+        <div class="icon-wrap"><i class="ti ti-coin" aria-hidden="true"></i></div>
+        <div>
+          <div class="btn-label">Financeiro</div>
+          <div class="btn-sub">Contas fixas · Movimentações</div>
+        </div>
+        <i class="ti ti-chevron-right arrow" aria-hidden="true"></i>
+      </button>
+      <button class="tree-btn btn-green" onclick="goto('compras')">
+        <div class="icon-wrap"><i class="ti ti-shopping-cart" aria-hidden="true"></i></div>
+        <div>
+          <div class="btn-label">Compras</div>
+          <div class="btn-sub">Lista de compras · Histórico</div>
+        </div>
+        <i class="ti ti-chevron-right arrow" aria-hidden="true"></i>
+      </button>
+      <button class="tree-btn btn-purple" onclick="goto('agenda')">
+        <div class="icon-wrap"><i class="ti ti-calendar" aria-hidden="true"></i></div>
+        <div>
+          <div class="btn-label">Agenda</div>
+          <div class="btn-sub">Eventos · Compromissos</div>
+        </div>
+        <i class="ti ti-chevron-right arrow" aria-hidden="true"></i>
+      </button>
+      <button class="tree-btn btn-amber" onclick="goto('recados')">
+        <div class="icon-wrap"><i class="ti ti-message-circle" aria-hidden="true"></i></div>
+        <div>
+          <div class="btn-label">Recados</div>
+          <div class="btn-sub">Mural da família</div>
+        </div>
+        <i class="ti ti-chevron-right arrow" aria-hidden="true"></i>
+      </button>
+      <button class="tree-btn btn-red" onclick="goto('metas')">
+        <div class="icon-wrap"><i class="ti ti-target" aria-hidden="true"></i></div>
+        <div>
+          <div class="btn-label">Metas</div>
+          <div class="btn-sub">Objetivos · Economia</div>
+        </div>
+        <i class="ti ti-chevron-right arrow" aria-hidden="true"></i>
+      </button>
+    </div>
+
+    <!-- FINANCEIRO -->
+    <div id="pg-financeiro" class="screen">
+      <div class="screen-head">
+        <button class="back-btn" onclick="goback()" aria-label="Voltar"><i class="ti ti-arrow-left"></i></button>
+        <div class="screen-title">Financeiro</div>
+      </div>
+      <div class="tabs">
+        <button class="tab on" id="ft0" onclick="ftab(0)">Movimentações</button>
+        <button class="tab" id="ft1" onclick="ftab(1)">Contas fixas</button>
+        <button class="tab" id="ft2" onclick="ftab(2)">Histórico</button>
+      </div>
+
+      <!-- TAB 0: MOVIMENTAÇÕES -->
+      <div id="ftab0">
+        <div style="height:12px"></div>
+        <div class="metrics" id="fin-metrics"></div>
+        <div class="card">
+          <div class="card-title"><i class="ti ti-plus" aria-hidden="true"></i>Nova movimentação</div>
+          <div class="field"><label>Descrição</label><input id="fin-desc" placeholder="Ex: Mercado, Salário..."></div>
+          <div class="r2">
+            <div class="field"><label>Valor (R$)</label><input id="fin-val" type="number" inputmode="decimal" min="0" step="0.01" placeholder="0,00"></div>
+            <div class="field"><label>Tipo</label><select id="fin-type"><option value="expense">Despesa</option><option value="income">Receita</option></select></div>
+          </div>
+          <div class="r2">
+            <div class="field"><label>Categoria</label>
+              <select id="fin-cat"><option>Moradia</option><option>Alimentação</option><option>Transporte</option><option>Saúde</option><option>Educação</option><option>Lazer</option><option>Salário</option><option>Outros</option></select>
+            </div>
+            <div class="field"><label>Quem</label><select id="fin-who"><option value="P1">Pessoa 1</option><option value="P2">Pessoa 2</option><option value="casa">Casa</option></select></div>
+          </div>
+          <div class="field"><label>Data</label><input id="fin-date" type="date"></div>
+          <button class="btn-go" style="background:var(--c1);color:#fff" onclick="addTr()">Adicionar</button>
+        </div>
+        <div class="card">
+          <div class="card-title"><i class="ti ti-list" aria-hidden="true"></i>Recentes</div>
+          <div id="fin-list"></div>
+        </div>
+      </div>
+
+      <!-- TAB 1: CONTAS FIXAS -->
+      <div id="ftab1" style="display:none">
+        <div style="height:12px"></div>
+        <div class="metrics" id="cf-metrics"></div>
+        <div class="card">
+          <div class="card-title"><i class="ti ti-plus" aria-hidden="true"></i>Nova conta fixa</div>
+          <div class="field"><label>Descrição</label><input id="cf-desc" placeholder="Ex: Aluguel, Internet..."></div>
+          <div class="r2">
+            <div class="field"><label>Valor (R$)</label><input id="cf-val" type="number" inputmode="decimal" min="0" step="0.01" placeholder="0,00"></div>
+            <div class="field"><label>Vence dia</label><input id="cf-day" type="number" inputmode="numeric" min="1" max="31" placeholder="10"></div>
+          </div>
+          <div class="field"><label>Categoria</label>
+            <select id="cf-cat"><option>Moradia</option><option>Serviços</option><option>Transporte</option><option>Saúde</option><option>Educação</option><option>Assinaturas</option><option>Outros</option></select>
+          </div>
+          <button class="btn-go" style="background:var(--c1);color:#fff" onclick="addCF()">Adicionar</button>
+        </div>
+        <div class="card">
+          <div class="card-title"><i class="ti ti-list" aria-hidden="true"></i>Contas do mês</div>
+          <div id="cf-list"></div>
+        </div>
+      </div>
+
+      <!-- TAB 2: HISTÓRICO -->
+      <div id="ftab2" style="display:none">
+        <div class="pad" style="padding-top:16px" id="hist-area"></div>
+      </div>
+    </div>
+
+    <!-- COMPRAS -->
+    <div id="pg-compras" class="screen">
+      <div class="screen-head">
+        <button class="back-btn" onclick="goback()" aria-label="Voltar"><i class="ti ti-arrow-left"></i></button>
+        <div class="screen-title">Compras</div>
+      </div>
+      <div class="tabs">
+        <button class="tab on" id="ct0" onclick="ctab(0)">Lista atual</button>
+        <button class="tab" id="ct1" onclick="ctab(1)">Histórico</button>
+      </div>
+      <div id="ctab0">
+        <div style="height:12px"></div>
+        <div class="card">
+          <div class="card-title"><i class="ti ti-plus" aria-hidden="true"></i>Adicionar item</div>
+          <div class="field"><label>Item</label><input id="sh-item" placeholder="Ex: Arroz, Detergente..."></div>
+          <div class="r3">
+            <div class="field"><label>Qtd</label><input id="sh-qty" type="number" inputmode="numeric" min="1" value="1"></div>
+            <div class="field" style="grid-column:2/4"><label>Lista</label>
+              <select id="sh-list"><option>Mercado</option><option>Farmácia</option><option>Hortifruti</option><option>Outros</option></select>
+            </div>
+          </div>
+          <button class="btn-go" style="background:var(--c2);color:#fff" onclick="addSH()">Adicionar</button>
+        </div>
+        <div id="sh-area"></div>
+      </div>
+      <div id="ctab1" style="display:none">
+        <div style="height:12px"></div>
+        <div class="card">
+          <div class="card-title"><i class="ti ti-history" aria-hidden="true"></i>Listas arquivadas</div>
+          <div id="sh-hist"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- AGENDA -->
+    <div id="pg-agenda" class="screen">
+      <div class="screen-head">
+        <button class="back-btn" onclick="goback()" aria-label="Voltar"><i class="ti ti-arrow-left"></i></button>
+        <div class="screen-title">Agenda</div>
+      </div>
+      <div style="height:12px"></div>
+      <div class="card">
+        <div class="card-title"><i class="ti ti-plus" aria-hidden="true"></i>Novo evento</div>
+        <div class="field"><label>Evento</label><input id="ev-title" placeholder="Ex: Consulta médica..."></div>
+        <div class="r2">
+          <div class="field"><label>Data</label><input id="ev-date" type="date"></div>
+          <div class="field"><label>Horário</label><input id="ev-time" type="time"></div>
+        </div>
+        <div class="field"><label>Categoria</label>
+          <select id="ev-cat"><option value="p">Pessoal</option><option value="c">Casa</option><option value="s">Saúde</option><option value="e">Escola/Trabalho</option></select>
+        </div>
+        <button class="btn-go" style="background:var(--c3);color:#fff" onclick="addEV()">Adicionar</button>
+      </div>
+      <div id="ev-list"></div>
+    </div>
+
+    <!-- RECADOS -->
+    <div id="pg-recados" class="screen">
+      <div class="screen-head">
+        <button class="back-btn" onclick="goback()" aria-label="Voltar"><i class="ti ti-arrow-left"></i></button>
+        <div class="screen-title">Recados</div>
+      </div>
+      <div style="height:12px"></div>
+      <div class="card">
+        <div class="card-title"><i class="ti ti-pencil" aria-hidden="true"></i>Novo recado</div>
+        <div class="field"><label>De quem</label>
+          <select id="nt-author"><option value="P1">Pessoa 1</option><option value="P2">Pessoa 2</option></select>
+        </div>
+        <div class="field"><label>Mensagem</label><textarea id="nt-text" placeholder="Deixe um recado..."></textarea></div>
+        <button class="btn-go" style="background:var(--c4);color:#fff" onclick="addNT()">Enviar recado</button>
+      </div>
+      <div id="nt-list"></div>
+    </div>
+
+    <!-- METAS -->
+    <div id="pg-metas" class="screen">
+      <div class="screen-head">
+        <button class="back-btn" onclick="goback()" aria-label="Voltar"><i class="ti ti-arrow-left"></i></button>
+        <div class="screen-title">Metas</div>
+      </div>
+      <div style="height:12px"></div>
+      <div class="card">
+        <div class="card-title"><i class="ti ti-plus" aria-hidden="true"></i>Nova meta</div>
+        <div class="field"><label>Nome da meta</label><input id="mt-name" placeholder="Ex: Viagem, Reserva de emergência..."></div>
+        <div class="r2">
+          <div class="field"><label>Valor alvo (R$)</label><input id="mt-target" type="number" inputmode="decimal" min="1" step="0.01" placeholder="5000,00"></div>
+          <div class="field"><label>Prazo</label><input id="mt-date" type="date"></div>
+        </div>
+        <button class="btn-go" style="background:var(--c5);color:#fff" onclick="addMT()">Criar meta</button>
+      </div>
+      <div id="mt-list"></div>
+    </div>
+
+  </div><!-- /scroll -->
+</div><!-- /app -->
+
+<script>
+const S={get(k){try{return JSON.parse(localStorage.getItem('cn3_'+k)||'null')}catch{return null}},set(k,v){try{localStorage.setItem('cn3_'+k,JSON.stringify(v))}catch{}}};
+let TR=S.get('tr')||[],SI=S.get('si')||[],SH=S.get('sh')||[],EV=S.get('ev')||[],MT=S.get('mt')||[],CF=S.get('cf')||[],NT=S.get('nt')||[];
+function save(){S.set('tr',TR);S.set('si',SI);S.set('sh',SH);S.set('ev',EV);S.set('mt',MT);S.set('cf',CF);S.set('nt',NT);}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2)}
+function tod(){return new Date().toISOString().slice(0,10)}
+function fmt(v){return 'R$ '+Number(v).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})}
+
+let cur='home';
+function goto(pg){
+  document.getElementById('pg-'+cur).style.display='none';
+  document.getElementById('pg-'+pg).classList.add('active');
+  document.getElementById('pg-'+pg).style.display='';
+  cur=pg;
+  document.getElementById('scroll-area').scrollTop=0;
+  renders[pg]&&renders[pg]();
+}
+function goback(){
+  document.getElementById('pg-'+cur).classList.remove('active');
+  document.getElementById('pg-'+cur).style.display='none';
+  document.getElementById('pg-home').style.display='';
+  cur='home';
+  document.getElementById('scroll-area').scrollTop=0;
+}
+
+// HIDE all screens initially
+document.querySelectorAll('.screen').forEach(s=>s.style.display='none');
+document.getElementById('pg-home').style.display='';
+
+// FIN TABS
+function ftab(n){
+  [0,1,2].forEach(i=>{
+    document.getElementById('ftab'+i).style.display=i===n?'':'none';
+    document.getElementById('ft'+i).classList.toggle('on',i===n);
+  });
+  if(n===0)renderFin();if(n===1)renderCF();if(n===2)renderHist();
+}
+// COMPRAS TABS
+function ctab(n){
+  [0,1].forEach(i=>{
+    document.getElementById('ctab'+i).style.display=i===n?'':'none';
+    document.getElementById('ct'+i).classList.toggle('on',i===n);
+  });
+  if(n===0)renderSH();if(n===1)renderSHHist();
+}
+
+// FINANÇAS
+function renderFin(){
+  const inc=TR.filter(t=>t.type==='income').reduce((a,t)=>a+t.val,0);
+  const exp=TR.filter(t=>t.type==='expense').reduce((a,t)=>a+t.val,0);
+  const bal=inc-exp;
+  document.getElementById('fin-metrics').innerHTML=`
+    <div class="metric"><div class="ml">Receitas</div><div class="mv g">${fmt(inc)}</div></div>
+    <div class="metric"><div class="ml">Despesas</div><div class="mv r">${fmt(exp)}</div></div>
+    <div class="metric"><div class="ml">Saldo</div><div class="mv ${bal>=0?'g':'r'}">${fmt(bal)}</div></div>`;
+  const s=[...TR].sort((a,b)=>b.date.localeCompare(a.date)).slice(0,30);
+  const el=document.getElementById('fin-list');
+  if(!s.length){el.innerHTML='<div class="empty"><i class="ti ti-inbox"></i><p>Nenhuma movimentação</p></div>';return;}
+  el.innerHTML=s.map(t=>`<div class="item">
+    <div class="im"><div class="in">${t.desc}</div><div class="is">${t.date} · ${t.cat}${t.who?' · '+t.who:''}</div></div>
+    <span class="badge ${t.type==='income'?'bg':'br'}">${t.type==='income'?'+':'-'}${fmt(t.val)}</span>
+    <button class="delbtn" onclick="delTR('${t.id}')"><i class="ti ti-trash" style="font-size:18px"></i></button>
+  </div>`).join('');
+}
+function addTr(){
+  const desc=document.getElementById('fin-desc').value.trim();
+  const val=parseFloat(document.getElementById('fin-val').value);
+  const type=document.getElementById('fin-type').value;
+  const cat=document.getElementById('fin-cat').value;
+  const who=document.getElementById('fin-who').value;
+  const date=document.getElementById('fin-date').value;
+  if(!desc||!val||!date)return alert('Preencha descrição, valor e data.');
+  TR.push({id:uid(),desc,val,type,cat,who,date});save();renderFin();
+  document.getElementById('fin-desc').value='';document.getElementById('fin-val').value='';
+}
+function delTR(id){TR=TR.filter(t=>t.id!==id);save();renderFin();}
+
+// CONTAS FIXAS
+function renderCF(){
+  const td=new Date(),dh=td.getDate(),mk=td.toISOString().slice(0,7);
+  const total=CF.reduce((a,c)=>a+c.val,0);
+  const pagas=CF.filter(c=>c.pago&&c.pago[mk]).reduce((a,c)=>a+c.val,0);
+  const pend=total-pagas;
+  document.getElementById('cf-metrics').innerHTML=`
+    <div class="metric"><div class="ml">Total</div><div class="mv">${fmt(total)}</div></div>
+    <div class="metric"><div class="ml">Pagas</div><div class="mv g">${fmt(pagas)}</div></div>
+    <div class="metric"><div class="ml">Pendentes</div><div class="mv ${pend>0?'r':''}">${fmt(pend)}</div></div>`;
+  const el=document.getElementById('cf-list');
+  if(!CF.length){el.innerHTML='<div class="empty"><i class="ti ti-receipt"></i><p>Nenhuma conta cadastrada</p></div>';return;}
+  el.innerHTML=[...CF].sort((a,b)=>a.day-b.day).map(c=>{
+    const ip=!!(c.pago&&c.pago[mk]);
+    const dias=c.day-dh;
+    let bd='';
+    if(!ip){if(dias<0)bd='<span class="badge br">Vencida</span>';else if(dias<=3)bd=`<span class="badge ba">Vence em ${dias}d</span>`;}
+    return`<div class="item">
+      <div class="im"><div class="in" style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">${c.desc} ${bd}</div><div class="is">Dia ${c.day} · ${c.cat}</div></div>
+      <span style="font-size:13px;font-weight:500;margin-right:6px;white-space:nowrap">${fmt(c.val)}</span>
+      <button class="pbtn ${ip?'on':''}" onclick="togPago('${c.id}')">${ip?'✓ Paga':'Pagar'}</button>
+      <button class="delbtn" onclick="delCF('${c.id}')"><i class="ti ti-trash" style="font-size:18px"></i></button>
+    </div>`;
+  }).join('');
+}
+function addCF(){
+  const desc=document.getElementById('cf-desc').value.trim();
+  const val=parseFloat(document.getElementById('cf-val').value);
+  const day=parseInt(document.getElementById('cf-day').value);
+  const cat=document.getElementById('cf-cat').value;
+  if(!desc||!val||!day)return alert('Preencha todos os campos.');
+  CF.push({id:uid(),desc,val,day,cat,pago:{}});save();renderCF();
+  document.getElementById('cf-desc').value='';document.getElementById('cf-val').value='';document.getElementById('cf-day').value='';
+}
+function togPago(id){const mk=new Date().toISOString().slice(0,7),c=CF.find(x=>x.id===id);if(!c)return;if(!c.pago)c.pago={};c.pago[mk]=!c.pago[mk];save();renderCF();}
+function delCF(id){CF=CF.filter(x=>x.id!==id);save();renderCF();}
+
+// HISTÓRICO
+function renderHist(){
+  const el=document.getElementById('hist-area');
+  if(!TR.length){el.innerHTML='<div class="empty"><i class="ti ti-chart-bar"></i><p>Sem movimentações</p></div>';return;}
+  const bm={};
+  TR.forEach(t=>{const m=t.date.slice(0,7);if(!bm[m])bm[m]={inc:0,exp:0,cats:{}};if(t.type==='income')bm[m].inc+=t.val;else{bm[m].exp+=t.val;bm[m].cats[t.cat]=(bm[m].cats[t.cat]||0)+t.val;}});
+  el.innerHTML=Object.keys(bm).sort().reverse().map(m=>{
+    const d=bm[m],bal=d.inc-d.exp;
+    const [y,mo]=m.split('-');
+    const lbl=new Date(+y,+mo-1,1).toLocaleDateString('pt-BR',{month:'long',year:'numeric'});
+    const top=Object.entries(d.cats).sort((a,b)=>b[1]-a[1]).slice(0,3);
+    return`<div style="margin-bottom:20px">
+      <div style="font-family:'Lora',serif;font-size:15px;font-weight:600;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--border)">${lbl}</div>
+      <div class="metrics" style="margin:0 0 8px">
+        <div class="metric"><div class="ml">Receitas</div><div class="mv g">${fmt(d.inc)}</div></div>
+        <div class="metric"><div class="ml">Despesas</div><div class="mv r">${fmt(d.exp)}</div></div>
+        <div class="metric"><div class="ml">Saldo</div><div class="mv ${bal>=0?'g':'r'}">${fmt(bal)}</div></div>
+      </div>
+      ${top.length?`<div style="font-size:12px;color:var(--text2)">${top.map(([c,v])=>`${c}: ${fmt(v)}`).join(' · ')}</div>`:''}
+    </div>`;
+  }).join('');
+}
+
+// COMPRAS
+function renderSH(){
+  const lists=['Mercado','Farmácia','Hortifruti','Outros'];
+  let html='';
+  lists.forEach(list=>{
+    const items=SI.filter(i=>i.list===list);
+    if(!items.length)return;
+    const done=items.filter(i=>i.done).length;
+    const pct=Math.round(done/items.length*100);
+    const allDone=done===items.length;
+    html+=`<div class="card">
+      <div class="card-title"><i class="ti ti-shopping-bag" aria-hidden="true"></i>${list}
+        <span style="font-size:12px;font-weight:400;color:var(--text2);margin-left:auto">${done}/${items.length}</span>
+      </div>
+      <div class="prog"><div class="pf ${allDone?'pg':'pb'}" style="width:${pct}%"></div></div>
+      <div style="margin-top:12px">
+      ${items.map(i=>`<div class="item">
+        <button class="chk ${i.done?'on':''}" onclick="togSH('${i.id}')" aria-label="Marcar">
+          ${i.done?'<i class="ti ti-check" style="font-size:13px;color:var(--c2)"></i>':''}
+        </button>
+        <div class="im">
+          <span style="font-size:14px;font-weight:500;${i.done?'text-decoration:line-through;color:var(--text3)':''}">${i.name}</span>
+          <span style="font-size:12px;color:var(--text2);margin-left:6px">× ${i.qty}</span>
+        </div>
+        <button class="delbtn" onclick="delSH('${i.id}')"><i class="ti ti-trash" style="font-size:18px"></i></button>
+      </div>`).join('')}
+      </div>
+      ${allDone?`<div style="margin-top:8px;text-align:right"><button class="pbtn" onclick="archSH('${list}')"><i class="ti ti-archive" style="font-size:13px;vertical-align:-2px;margin-right:3px"></i>Arquivar lista</button></div>`:''}
+    </div>`;
+  });
+  document.getElementById('sh-area').innerHTML=html||'<div class="card"><div class="empty"><i class="ti ti-shopping-cart"></i><p>Nenhum item nas listas</p></div></div>';
+}
+function renderSHHist(){
+  const el=document.getElementById('sh-hist');
+  if(!SH.length){el.innerHTML='<div class="empty" style="padding:20px"><p>Nenhuma lista arquivada</p></div>';return;}
+  el.innerHTML=[...SH].reverse().slice(0,8).map((h,ri)=>`<div class="item">
+    <div class="im"><div class="in">${h.list}</div><div class="is">${h.date} · ${h.items.length} itens: ${h.items.slice(0,3).map(i=>i.name).join(', ')}${h.items.length>3?'...':''}</div></div>
+    <button class="pbtn" onclick="restSH(${SH.length-1-ri})"><i class="ti ti-refresh" style="font-size:13px;vertical-align:-2px;margin-right:3px"></i>Reusar</button>
+  </div>`).join('');
+}
+function addSH(){
+  const name=document.getElementById('sh-item').value.trim();
+  const qty=parseInt(document.getElementById('sh-qty').value)||1;
+  const list=document.getElementById('sh-list').value;
+  if(!name)return;
+  SI.push({id:uid(),name,qty,list,done:false});save();renderSH();
+  document.getElementById('sh-item').value='';document.getElementById('sh-qty').value='1';
+}
+function togSH(id){const i=SI.find(x=>x.id===id);if(i)i.done=!i.done;save();renderSH();}
+function delSH(id){SI=SI.filter(x=>x.id!==id);save();renderSH();}
+function archSH(list){SH.push({list,date:tod(),items:[...SI.filter(i=>i.list===list)]});SI=SI.filter(i=>i.list!==list);save();renderSH();}
+function restSH(idx){SH[idx].items.forEach(i=>SI.push({id:uid(),name:i.name,qty:i.qty,list:i.list,done:false}));save();renderSH();}
+
+// AGENDA
+const CM={p:{l:'Pessoal',d:'dp'},c:{l:'Casa',d:'dc'},s:{l:'Saúde',d:'ds'},e:{l:'Escola/Trabalho',d:'de'}};
+function renderAgenda(){
+  const el=document.getElementById('ev-list');
+  const td=tod();
+  const up=EV.filter(e=>e.date>=td).sort((a,b)=>a.date.localeCompare(b.date)||a.time.localeCompare(b.time));
+  if(!up.length){el.innerHTML='<div class="empty"><i class="ti ti-calendar-off"></i><p>Nenhum evento próximo</p></div>';return;}
+  const bd={};
+  up.forEach(e=>{if(!bd[e.date])bd[e.date]=[];bd[e.date].push(e);});
+  el.innerHTML=Object.entries(bd).map(([date,evts])=>{
+    const d=new Date(date+'T12:00:00');
+    const lbl=d.toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long'});
+    return`<div class="dlabel">${lbl}</div>
+    ${evts.map(e=>{const c=CM[e.cat]||{l:e.cat,d:'dp'};return`<div class="ev">
+      <div class="dot ${c.d}"></div>
+      <div style="flex:1"><div style="font-size:14px;font-weight:500">${e.title}</div><div style="font-size:12px;color:var(--text2);margin-top:2px">${e.time?e.time+' · ':''}${c.l}</div></div>
+      <button class="delbtn" onclick="delEV('${e.id}')"><i class="ti ti-trash" style="font-size:18px"></i></button>
+    </div>`;}).join('')}`;
+  }).join('');
+}
+function addEV(){
+  const title=document.getElementById('ev-title').value.trim();
+  const date=document.getElementById('ev-date').value;
+  const time=document.getElementById('ev-time').value;
+  const cat=document.getElementById('ev-cat').value;
+  if(!title||!date)return alert('Preencha título e data.');
+  EV.push({id:uid(),title,date,time,cat});save();renderAgenda();
+  document.getElementById('ev-title').value='';
+}
+function delEV(id){EV=EV.filter(e=>e.id!==id);save();renderAgenda();}
+
+// RECADOS
+function renderRecados(){
+  const el=document.getElementById('nt-list');
+  if(!NT.length){el.innerHTML='<div class="card"><div class="empty"><i class="ti ti-message-off"></i><p>Nenhum recado ainda</p></div></div>';return;}
+  el.innerHTML=[...NT].reverse().map(n=>`
+    <div class="note">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <div style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:500;color:var(--text2)">
+          <div class="av ${n.author==='P1'?'av1':'av2'}" style="width:26px;height:26px;font-size:10px">${n.author}</div>
+          Pessoa ${n.author==='P1'?'1':'2'}
+        </div>
+        <div style="display:flex;align-items:center;gap:6px">
+          <span style="font-size:12px;color:var(--text3)">${n.date}</span>
+          <button class="delbtn" onclick="delNT('${n.id}')"><i class="ti ti-trash" style="font-size:18px"></i></button>
+        </div>
+      </div>
+      <div style="font-size:14px;line-height:1.65;white-space:pre-wrap;color:var(--text)">${n.text}</div>
+    </div>`).join('');
+}
+function addNT(){
+  const text=document.getElementById('nt-text').value.trim();
+  const author=document.getElementById('nt-author').value;
+  if(!text)return;
+  NT.push({id:uid(),text,author,date:tod()});save();renderRecados();
+  document.getElementById('nt-text').value='';
+}
+function delNT(id){NT=NT.filter(x=>x.id!==id);save();renderRecados();}
+
+// METAS
+function renderMetas(){
+  const el=document.getElementById('mt-list');
+  if(!MT.length){el.innerHTML='<div class="card"><div class="empty"><i class="ti ti-target"></i><p>Nenhuma meta criada</p></div></div>';return;}
+  el.innerHTML=MT.map(m=>{
+    const pct=Math.min(100,Math.round(m.current/m.target*100));
+    const cls=pct>=100?'pg':pct>=60?'pb':pct>=30?'pa':'pr';
+    const left=Math.max(0,m.target-m.current);
+    return`<div class="meta-c">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start">
+        <div>
+          <div style="font-family:'Lora',serif;font-size:15px;font-weight:600">${m.name}</div>
+          <div style="font-size:12px;color:var(--text2);margin-top:3px">${fmt(m.current)} de ${fmt(m.target)} · ${pct}%${m.deadline?' · até '+m.deadline:''}</div>
+        </div>
+        <button class="delbtn" onclick="delMT('${m.id}')"><i class="ti ti-trash" style="font-size:18px"></i></button>
+      </div>
+      <div class="prog" style="margin-top:10px"><div class="pf ${cls}" style="width:${pct}%"></div></div>
+      ${pct<100?`<div style="font-size:12px;color:var(--text2);margin-top:6px">Faltam ${fmt(left)}</div>`:`<div style="font-size:12px;color:var(--c2);margin-top:6px;font-weight:500">✓ Meta atingida!</div>`}
+      <div style="margin-top:10px"><button class="pbtn" onclick="addToMT('${m.id}')"><i class="ti ti-plus" style="font-size:13px;vertical-align:-2px;margin-right:3px"></i>Adicionar valor</button></div>
+    </div>`;
+  }).join('');
+}
+function addMT(){
+  const name=document.getElementById('mt-name').value.trim();
+  const target=parseFloat(document.getElementById('mt-target').value);
+  const deadline=document.getElementById('mt-date').value;
+  if(!name||!target)return alert('Preencha nome e valor alvo.');
+  MT.push({id:uid(),name,target,current:0,deadline});save();renderMetas();
+  document.getElementById('mt-name').value='';document.getElementById('mt-target').value='';document.getElementById('mt-date').value='';
+}
+function addToMT(id){const v=parseFloat(prompt('Quanto deseja adicionar? (R$)'));if(isNaN(v)||v<=0)return;const m=MT.find(x=>x.id===id);if(m){m.current=Math.min(m.target,+(m.current+v).toFixed(2));save();renderMetas();}}
+function delMT(id){MT=MT.filter(x=>x.id!==id);save();renderMetas();}
+
+const renders={financeiro:renderFin,compras:renderSH,agenda:renderAgenda,recados:renderRecados,metas:renderMetas};
+
+// DATA
+const td=new Date();
+document.getElementById('hdate').textContent=td.toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long'});
+document.getElementById('fin-date').value=tod();
+document.getElementById('ev-date').value=tod();
+document.getElementById('mt-date').value=tod();
+</script>
+</body>
+</html>
