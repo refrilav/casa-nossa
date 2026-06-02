@@ -186,6 +186,7 @@ body{font-family:'DM Sans',sans-serif;color:var(--text)}
       <div class="tabs">
         <button class="tab on" id="ft0" onclick="ftab(0)">Movimentações</button>
         <button class="tab" id="ft1" onclick="ftab(1)">Contas fixas</button>
+        <button class="tab" id="ft3" onclick="ftab(3)">Parcelamentos</button>
         <button class="tab" id="ft2" onclick="ftab(2)">Histórico</button>
       </div>
 
@@ -278,6 +279,37 @@ body{font-family:'DM Sans',sans-serif;color:var(--text)}
         <div class="card">
           <div class="card-title"><i class="ti ti-list" aria-hidden="true"></i>Contas do mês</div>
           <div id="cf-list"></div>
+        </div>
+      </div>
+
+      <!-- TAB 3: PARCELAMENTOS -->
+      <div id="ftab3" style="display:none">
+        <div style="height:12px"></div>
+        <div class="metrics" id="parc-metrics"></div>
+        <div class="card">
+          <div class="card-title"><i class="ti ti-credit-card" aria-hidden="true"></i>Novo parcelamento</div>
+          <div class="field"><label>Descrição</label><input id="pc-desc" placeholder="Ex: Seguro do carro, Geladeira..."></div>
+          <div class="r2">
+            <div class="field"><label>Valor total (R$)</label><input id="pc-total" type="number" inputmode="decimal" min="0" step="0.01" placeholder="0,00" oninput="calcPCPreview()"></div>
+            <div class="field"><label>Nº de parcelas</label><input id="pc-n" type="number" inputmode="numeric" min="2" max="60" placeholder="12" oninput="calcPCPreview()"></div>
+          </div>
+          <div class="r2">
+            <div class="field"><label>Categoria</label><select id="pc-cat"></select></div>
+            <div class="field"><label>Dia de vencimento</label><input id="pc-day" type="number" inputmode="numeric" min="1" max="31" placeholder="10"></div>
+          </div>
+          <div class="field"><label>Primeira parcela em</label><input id="pc-start" type="month"></div>
+          <div id="pc-preview" style="background:var(--c3bg);border-radius:10px;padding:12px;margin-bottom:10px;display:none">
+            <div style="font-size:13px;color:var(--c3);font-weight:500" id="pc-preview-text"></div>
+          </div>
+          <button class="btn-go" style="background:var(--c3);color:#fff" onclick="addPC()">Cadastrar parcelamento</button>
+        </div>
+        <div class="card">
+          <div class="card-title"><i class="ti ti-list" aria-hidden="true"></i>Parcelamentos ativos</div>
+          <div id="pc-list"></div>
+        </div>
+        <div class="card">
+          <div class="card-title" style="color:var(--text3)"><i class="ti ti-check" aria-hidden="true"></i>Concluídos</div>
+          <div id="pc-done-list"></div>
         </div>
       </div>
 
@@ -477,11 +509,16 @@ document.getElementById('pg-home').style.display='';
 
 // FIN TABS
 function ftab(n){
-  [0,1,2].forEach(i=>{
-    document.getElementById('ftab'+i).style.display=i===n?'':'none';
-    document.getElementById('ft'+i).classList.toggle('on',i===n);
+  [0,1,2,3].forEach(i=>{
+    const el=document.getElementById('ftab'+i);
+    const btn=document.getElementById('ft'+i);
+    if(el)el.style.display=i===n?'':'none';
+    if(btn)btn.classList.toggle('on',i===n);
   });
-  if(n===0)renderFin();if(n===1){buildCatSelect('cf-cat');renderCF();}if(n===2)renderHist();
+  if(n===0)renderFin();
+  if(n===1){buildCatSelect('cf-cat');renderCF();}
+  if(n===2)renderHist();
+  if(n===3){buildCatSelect('pc-cat');renderPC();}
 }
 function ctab(n){
   [0,1].forEach(i=>{
@@ -823,6 +860,127 @@ function exportData(){
   document.body.removeChild(a);URL.revokeObjectURL(url);
 }
 
+// PARCELAMENTOS
+let PC=S.get('pc')||[];
+function savePC(){S.set('pc',PC);}
+
+function calcPCPreview(){
+  const total=parseFloat(document.getElementById('pc-total').value)||0;
+  const n=parseInt(document.getElementById('pc-n').value)||0;
+  const prev=document.getElementById('pc-preview');
+  const prevText=document.getElementById('pc-preview-text');
+  if(total>0&&n>=2){
+    const pp=total/n;
+    prev.style.display='block';
+    prevText.textContent=`${n}x de ${fmt(pp)} = total ${fmt(total)}`;
+  } else {
+    prev.style.display='none';
+  }
+}
+
+function addPC(){
+  const desc=document.getElementById('pc-desc').value.trim();
+  const total=parseFloat(document.getElementById('pc-total').value);
+  const n=parseInt(document.getElementById('pc-n').value);
+  const cat=document.getElementById('pc-cat').value;
+  const day=parseInt(document.getElementById('pc-day').value);
+  const start=document.getElementById('pc-start').value;
+  if(!desc||!total||!n||!day||!start)return alert('Preencha todos os campos.');
+  const parcVal=+(total/n).toFixed(2);
+  const [yr,mo]=start.split('-').map(Number);
+  const parcelas=[];
+  for(let i=0;i<n;i++){
+    let m=mo-1+i;
+    let y=yr+Math.floor(m/12);
+    m=m%12;
+    const dateStr=`${y}-${String(m+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+    parcelas.push({idx:i+1,date:dateStr,pago:false});
+  }
+  PC.push({id:uid(),desc,total,n,parcVal,cat,day,start,parcelas});
+  savePC();renderPC();
+  document.getElementById('pc-desc').value='';
+  document.getElementById('pc-total').value='';
+  document.getElementById('pc-n').value='';
+  document.getElementById('pc-day').value='';
+  document.getElementById('pc-preview').style.display='none';
+}
+
+function renderPC(){
+  const ativos=PC.filter(p=>p.parcelas.some(x=>!x.pago));
+  const concluidos=PC.filter(p=>p.parcelas.every(x=>x.pago));
+  const totalMes=ativos.reduce((a,p)=>{
+    const mk=new Date().toISOString().slice(0,7);
+    const parc=p.parcelas.find(x=>x.date.slice(0,7)===mk&&!x.pago);
+    return a+(parc?p.parcVal:0);
+  },0);
+  const totalRestante=ativos.reduce((a,p)=>a+p.parcelas.filter(x=>!x.pago).length*p.parcVal,0);
+  document.getElementById('parc-metrics').innerHTML=`
+    <div class="metric"><div class="ml">Ativos</div><div class="mv">${ativos.length}</div></div>
+    <div class="metric"><div class="ml">Este mês</div><div class="mv r">${fmt(totalMes)}</div></div>
+    <div class="metric"><div class="ml">Total restante</div><div class="mv r">${fmt(totalRestante)}</div></div>`;
+
+  const elA=document.getElementById('pc-list');
+  const elD=document.getElementById('pc-done-list');
+
+  if(!ativos.length){elA.innerHTML='<div class="empty"><i class="ti ti-credit-card"></i><p>Nenhum parcelamento ativo</p></div>';}
+  else{
+    elA.innerHTML=ativos.map(p=>{
+      const pagas=p.parcelas.filter(x=>x.pago).length;
+      const pct=Math.round(pagas/p.n*100);
+      const mk=new Date().toISOString().slice(0,7);
+      const proxima=p.parcelas.find(x=>!x.pago);
+      const hoje=new Date().toISOString().slice(0,10);
+      const dias=proxima?Math.ceil((new Date(proxima.date)-new Date(hoje))/(1000*60*60*24)):null;
+      let badge='';
+      if(proxima){
+        if(dias<0)badge='<span class="badge br">Vencida</span>';
+        else if(dias===0)badge='<span class="badge br">Vence hoje!</span>';
+        else if(dias<=5)badge=`<span class="badge ba">Vence em ${dias}d</span>`;
+      }
+      return`<div style="border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:10px">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
+          <div>
+            <div style="font-size:14px;font-weight:500">${p.desc} ${badge}</div>
+            <div style="font-size:12px;color:var(--text2);margin-top:2px">${p.cat} · ${fmt(p.parcVal)}/parcela · Total: ${fmt(p.total)}</div>
+          </div>
+          <button class="delbtn" onclick="confirmDel('Excluir parcelamento &quot;${p.desc}&quot;?',()=>delPC('${p.id}'))"><i class="ti ti-trash" style="font-size:18px"></i></button>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+          <span style="font-size:12px;color:var(--text2)">${pagas} de ${p.n} parcelas pagas</span>
+          <span style="font-size:12px;font-weight:500;color:var(--c3)">${pct}%</span>
+        </div>
+        <div class="prog"><div class="pf pb" style="width:${pct}%"></div></div>
+        ${proxima?`<div style="margin-top:10px;display:flex;align-items:center;justify-content:space-between">
+          <span style="font-size:12px;color:var(--text2)">Próxima: parcela ${proxima.idx}/${p.n} em ${proxima.date}</span>
+          <button class="pbtn" onclick="pagarParcela('${p.id}','${proxima.idx}')">Pagar parcela</button>
+        </div>`:''}
+      </div>`;
+    }).join('');
+  }
+
+  if(!concluidos.length){elD.innerHTML='<div style="padding:8px 0;font-size:13px;color:var(--text3)">Nenhum parcelamento concluído ainda.</div>';}
+  else{
+    elD.innerHTML=concluidos.map(p=>`<div class="item">
+      <div class="im"><div class="in">${p.desc}</div><div class="is">${p.n} parcelas de ${fmt(p.parcVal)} · Total: ${fmt(p.total)}</div></div>
+      <span class="badge bg">Quitado</span>
+      <button class="delbtn" onclick="confirmDel('Remover &quot;${p.desc}&quot;?',()=>delPC('${p.id}'))"><i class="ti ti-trash" style="font-size:18px"></i></button>
+    </div>`).join('');
+  }
+}
+
+function pagarParcela(pcId,idx){
+  const p=PC.find(x=>x.id===pcId);
+  if(!p)return;
+  const parc=p.parcelas.find(x=>x.idx===parseInt(idx));
+  if(!parc)return;
+  parc.pago=true;
+  // Registrar na movimentação
+  TR.push({id:uid(),desc:`[Parcela ${parc.idx}/${p.n}] ${p.desc}`,val:p.parcVal,type:'expense',cat:p.cat,who:'casa',date:parc.date});
+  save();savePC();renderPC();renderFin();
+}
+
+function delPC(id){PC=PC.filter(x=>x.id!==id);savePC();renderPC();}
+
 const renders={financeiro:()=>{buildCatSelect('fin-cat');renderFin();},compras:renderSH,agenda:renderAgenda,recados:renderRecados,metas:renderMetas};
 
 // INIT
@@ -833,7 +991,10 @@ document.getElementById('ev-date').value=tod();
 document.getElementById('mt-date').value=tod();
 buildCatSelect('fin-cat');
 buildCatSelect('cf-cat');
+buildCatSelect('pc-cat');
 toggleParc();
+// default month for pc-start
+document.getElementById('pc-start').value=new Date().toISOString().slice(0,7);
 // checar notificações ao abrir
 setTimeout(checkNotifications,1500);
 </script>
