@@ -193,30 +193,75 @@ body{font-family:'DM Sans',sans-serif;color:var(--text)}
 
       <!-- TAB 4: VISÃO GERAL -->
       <div id="ftab4">
-        <div style="height:12px"></div>
-        <!-- SALDO DO MÊS -->
-        <div style="margin:0 16px 12px;background:var(--c1bg);border-radius:var(--radius-sm);padding:16px">
-          <div style="font-size:11px;font-weight:500;color:var(--c1);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px"><i class="ti ti-chart-pie" style="font-size:13px;vertical-align:-1px;margin-right:4px"></i>Resumo do mês</div>
-          <div id="vg-metrics" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px"></div>
-        </div>
-        <!-- CONTAS A PAGAR -->
-        <div class="card">
-          <div class="card-title" style="justify-content:space-between">
-            <span><i class="ti ti-calendar-due" aria-hidden="true"></i>Contas a pagar este mês</span>
-            <span id="vg-pagar-badge" style="font-size:12px;font-weight:400"></span>
+        <div style="height:14px"></div>
+
+        <!-- SALDO -->
+        <div style="margin:0 16px 14px;display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
+          <div style="background:var(--c2bg);border-radius:12px;padding:12px 10px;text-align:center">
+            <div style="font-size:11px;color:var(--c2);margin-bottom:3px;font-weight:500">Receitas</div>
+            <div style="font-size:15px;font-weight:500;color:var(--c2)" id="vg-inc">-</div>
           </div>
-          <div id="vg-pagar"></div>
+          <div style="background:var(--c5bg);border-radius:12px;padding:12px 10px;text-align:center">
+            <div style="font-size:11px;color:var(--c5);margin-bottom:3px;font-weight:500">Despesas</div>
+            <div style="font-size:15px;font-weight:500;color:var(--c5)" id="vg-exp">-</div>
+          </div>
+          <div id="vg-bal-card" style="border-radius:12px;padding:12px 10px;text-align:center">
+            <div style="font-size:11px;margin-bottom:3px;font-weight:500" id="vg-bal-label">Saldo</div>
+            <div style="font-size:15px;font-weight:500" id="vg-bal">-</div>
+          </div>
         </div>
-        <!-- PARCELAMENTOS DO MÊS -->
-        <div class="card">
-          <div class="card-title"><i class="ti ti-credit-card" aria-hidden="true"></i>Parcelas deste mês</div>
-          <div id="vg-parcelas"></div>
+
+        <!-- A PAGAR -->
+        <div style="margin:0 16px 6px;display:flex;align-items:center;justify-content:space-between">
+          <div style="font-size:13px;font-weight:500;color:var(--text2);display:flex;align-items:center;gap:6px">
+            <i class="ti ti-alert-circle" style="font-size:15px;color:var(--c5)"></i>
+            A pagar este mês
+          </div>
+          <div id="vg-total-badge" style="font-size:13px;font-weight:500;color:var(--c5)"></div>
         </div>
+
+        <!-- TABELA -->
+        <div class="card" style="padding:0;overflow:hidden">
+          <div style="overflow-x:auto;-webkit-overflow-scrolling:touch">
+            <table id="vg-table" style="width:100%;border-collapse:collapse;font-size:13px;min-width:320px">
+              <thead>
+                <tr style="background:var(--surface2)">
+                  <th style="padding:10px 14px;text-align:left;font-weight:500;color:var(--text2);font-size:11px;text-transform:uppercase;letter-spacing:.4px;white-space:nowrap">Descrição</th>
+                  <th style="padding:10px 10px;text-align:center;font-weight:500;color:var(--text2);font-size:11px;text-transform:uppercase;letter-spacing:.4px;white-space:nowrap">Vencimento</th>
+                  <th style="padding:10px 10px;text-align:left;font-weight:500;color:var(--text2);font-size:11px;text-transform:uppercase;letter-spacing:.4px;white-space:nowrap">Categoria</th>
+                  <th style="padding:10px 14px;text-align:right;font-weight:500;color:var(--text2);font-size:11px;text-transform:uppercase;letter-spacing:.4px;white-space:nowrap">Valor</th>
+                  <th style="padding:10px 10px;text-align:center;font-weight:500;color:var(--text2);font-size:11px;text-transform:uppercase;letter-spacing:.4px"></th>
+                </tr>
+              </thead>
+              <tbody id="vg-tbody"></tbody>
+            </table>
+          </div>
+          <div id="vg-empty" style="display:none;text-align:center;padding:32px;color:var(--text3)">
+            <i class="ti ti-circle-check" style="font-size:32px;display:block;margin-bottom:8px;color:var(--c2)"></i>
+            <div style="font-size:14px">Tudo pago este mês!</div>
+          </div>
+        </div>
+
         <!-- MOVIMENTAÇÕES RECENTES -->
-        <div class="card">
-          <div class="card-title"><i class="ti ti-list" aria-hidden="true"></i>Últimas movimentações</div>
-          <div id="vg-movs"></div>
+        <div style="margin:16px 16px 6px;font-size:13px;font-weight:500;color:var(--text2);display:flex;align-items:center;gap:6px">
+          <i class="ti ti-list" style="font-size:15px"></i>Últimas movimentações
         </div>
+        <div class="card" style="padding:0;overflow:hidden">
+          <div style="overflow-x:auto;-webkit-overflow-scrolling:touch">
+            <table style="width:100%;border-collapse:collapse;font-size:13px;min-width:300px">
+              <thead>
+                <tr style="background:var(--surface2)">
+                  <th style="padding:10px 14px;text-align:left;font-weight:500;color:var(--text2);font-size:11px;text-transform:uppercase;letter-spacing:.4px">Descrição</th>
+                  <th style="padding:10px 10px;text-align:center;font-weight:500;color:var(--text2);font-size:11px;text-transform:uppercase;letter-spacing:.4px">Data</th>
+                  <th style="padding:10px 14px;text-align:right;font-weight:500;color:var(--text2);font-size:11px;text-transform:uppercase;letter-spacing:.4px">Valor</th>
+                </tr>
+              </thead>
+              <tbody id="vg-mov-tbody"></tbody>
+            </table>
+          </div>
+          <div id="vg-mov-empty" style="display:none;text-align:center;padding:24px;color:var(--text3);font-size:14px">Nenhuma movimentação ainda.</div>
+        </div>
+        <div style="height:8px"></div>
       </div>
 
       <!-- TAB 0: MOVIMENTAÇÕES -->
@@ -1016,138 +1061,149 @@ function renderVG(){
   const hoje=new Date();
   const mk=hoje.toISOString().slice(0,7);
   const dh=hoje.getDate();
+  const anoAtual=hoje.getFullYear();
+  const mesAtual=hoje.getMonth()+1;
 
-  // MÉTRICAS DO MÊS
+  // SALDO DO MÊS
   const mesInc=TR.filter(t=>t.date.slice(0,7)===mk&&t.type==='income').reduce((a,t)=>a+t.val,0);
   const mesExp=TR.filter(t=>t.date.slice(0,7)===mk&&t.type==='expense').reduce((a,t)=>a+t.val,0);
   const mesBal=mesInc-mesExp;
-  document.getElementById('vg-metrics').innerHTML=`
-    <div style="background:rgba(255,255,255,0.5);border-radius:10px;padding:10px;text-align:center">
-      <div style="font-size:11px;color:var(--c1);margin-bottom:3px">Receitas</div>
-      <div style="font-size:15px;font-weight:500;color:var(--c2)">${fmt(mesInc)}</div>
-    </div>
-    <div style="background:rgba(255,255,255,0.5);border-radius:10px;padding:10px;text-align:center">
-      <div style="font-size:11px;color:var(--c1);margin-bottom:3px">Despesas</div>
-      <div style="font-size:15px;font-weight:500;color:var(--c5)">${fmt(mesExp)}</div>
-    </div>
-    <div style="background:rgba(255,255,255,0.5);border-radius:10px;padding:10px;text-align:center">
-      <div style="font-size:11px;color:var(--c1);margin-bottom:3px">Saldo</div>
-      <div style="font-size:15px;font-weight:500;color:${mesBal>=0?'var(--c2)':'var(--c5)'}">${fmt(mesBal)}</div>
-    </div>`;
+  document.getElementById('vg-inc').textContent=fmt(mesInc);
+  document.getElementById('vg-exp').textContent=fmt(mesExp);
+  const balEl=document.getElementById('vg-bal');
+  balEl.textContent=fmt(mesBal);
+  balEl.className='mv '+(mesBal>=0?'g':'r');
+  const balCard=document.getElementById('vg-bal-card');
+  const balLabel=document.getElementById('vg-bal-label');
+  if(balCard){balCard.style.background=mesBal>=0?'var(--c2bg)':'var(--c5bg)';}
+  if(balLabel){balLabel.style.color=mesBal>=0?'var(--c2)':'var(--c5)';}
 
-  // CONTAS FIXAS A PAGAR
-  const cfMes=CF.filter(c=>{
+  // MONTAR LISTA UNIFICADA
+  const itens=[];
+
+  // Contas fixas
+  CF.forEach(c=>{
+    // anual: só aparece no mês em que vence
     if(c.freq==='anual'){
-      // anual: só aparece no mês certo
-      const [sy,sm]=c.start?(c.start.split('-').map(Number)):[0,0];
-      return sm===(hoje.getMonth()+1);
+      if(!c.startMonth)return; // sem mês de início definido, pular
+      const [sy,sm]=c.startMonth.split('-').map(Number);
+      if(sm!==mesAtual)return;
     }
-    return true; // mensais sempre aparecem
-  });
-  const pagas=cfMes.filter(c=>c.pago&&c.pago[mk]).length;
-  const pendentes=cfMes.filter(c=>!(c.pago&&c.pago[mk])).length;
-  const totalPagar=cfMes.filter(c=>!(c.pago&&c.pago[mk])).reduce((a,c)=>a+c.val,0);
-
-  document.getElementById('vg-pagar-badge').innerHTML=
-    `<span class="badge ${pendentes>0?'br':'bg'}">${pendentes} pendente${pendentes!==1?'s':''} · ${fmt(totalPagar)}</span>`;
-
-  const elP=document.getElementById('vg-pagar');
-  if(!cfMes.length){
-    elP.innerHTML='<div class="empty" style="padding:16px"><p>Nenhuma conta fixa cadastrada</p></div>';
-  } else {
-    // ordenar: não pagas primeiro, depois por dia
-    const sorted=[...cfMes].sort((a,b)=>{
-      const ap=!!(a.pago&&a.pago[mk]);
-      const bp=!!(b.pago&&b.pago[mk]);
-      if(ap!==bp)return ap?1:-1;
-      return a.day-b.day;
+    const ip=!!(c.pago&&c.pago[mk]);
+    const dayStr=String(c.day).padStart(2,'0');
+    const mesStr=String(mesAtual).padStart(2,'0');
+    const vencDate=`${anoAtual}-${mesStr}-${dayStr}`;
+    itens.push({
+      id:'cf_'+c.id, desc:c.desc, venc:vencDate, vencDia:c.day,
+      cat:c.cat, val:c.val, pago:ip, _cfId:c.id
     });
-    elP.innerHTML=sorted.map(c=>{
-      const ip=!!(c.pago&&c.pago[mk]);
-      const dias=c.day-dh;
-      let badge='';
-      if(!ip){
-        if(dias<0)badge='<span class="badge br" style="font-size:10px">Vencida</span>';
-        else if(dias===0)badge='<span class="badge br" style="font-size:10px">Hoje!</span>';
-        else if(dias<=3)badge=`<span class="badge ba" style="font-size:10px">${dias}d</span>`;
-      }
-      return`<div class="item">
-        <div style="width:7px;height:7px;border-radius:50%;background:${ip?'var(--c2)':'var(--c5)'};flex-shrink:0;margin-top:2px"></div>
-        <div class="im">
-          <div class="in" style="display:flex;align-items:center;gap:6px">${c.desc} ${badge}</div>
-          <div class="is">Dia ${c.day} · ${c.cat}</div>
-        </div>
-        <span style="font-size:13px;font-weight:500;margin-right:8px;white-space:nowrap;${ip?'color:var(--text3);text-decoration:line-through':''}">${fmt(c.val)}</span>
-        <button class="pbtn ${ip?'on':''}" onclick="togPagoVG('${c.id}')">${ip?'✓':'Pagar'}</button>
-      </div>`;
-    }).join('');
-  }
+  });
 
-  // PARCELAS DO MÊS
-  const elPC=document.getElementById('vg-parcelas');
-  const parcMes=[];
+  // Parcelas do mês
   (PC||[]).forEach(p=>{
     const parc=p.parcelas.find(x=>x.date.slice(0,7)===mk);
-    if(parc)parcMes.push({p,parc});
+    if(!parc)return;
+    itens.push({
+      id:'pc_'+p.id+'_'+parc.idx,
+      desc:`${p.desc} (${parc.idx}/${p.n})`,
+      venc:parc.date,
+      vencDia:parseInt(parc.date.slice(8,10)),
+      cat:p.cat, val:p.parcVal, pago:parc.pago,
+      _pcId:p.id, _parcIdx:parc.idx
+    });
   });
-  if(!parcMes.length){
-    elPC.innerHTML='<div style="font-size:13px;color:var(--text3);padding:8px 0">Nenhuma parcela este mês.</div>';
+
+  // Pendentes primeiro (por dia), depois pagos
+  const pendentes=itens.filter(i=>!i.pago).sort((a,b)=>a.vencDia-b.vencDia);
+  const pagos=itens.filter(i=>i.pago).sort((a,b)=>a.vencDia-b.vencDia);
+  const ordenados=[...pendentes,...pagos];
+  const totalPendente=pendentes.reduce((a,i)=>a+i.val,0);
+
+  // Badge resumo
+  const badge=document.getElementById('vg-total-badge');
+  if(badge){
+    if(pendentes.length>0){
+      badge.innerHTML=`<span style="padding:4px 10px;border-radius:99px;font-size:12px;font-weight:500;background:var(--c5bg);color:var(--c5)">${pendentes.length} pendente${pendentes.length!==1?'s':''} · ${fmt(totalPendente)}</span>`;
+    } else {
+      badge.innerHTML=`<span style="padding:4px 10px;border-radius:99px;font-size:12px;font-weight:500;background:var(--c2bg);color:var(--c2)">Tudo pago ✓</span>`;
+    }
+  }
+
+  const tbody=document.getElementById('vg-tbody');
+  const empty=document.getElementById('vg-empty');
+
+  if(!ordenados.length){
+    if(tbody)tbody.innerHTML='';
+    if(empty)empty.style.display='block';
   } else {
-    elPC.innerHTML=parcMes.map(({p,parc})=>{
-      const dias=parseInt(parc.date.slice(8,10))-dh;
-      let badge='';
-      if(!parc.pago){
-        if(dias<0)badge='<span class="badge br" style="font-size:10px">Vencida</span>';
-        else if(dias===0)badge='<span class="badge br" style="font-size:10px">Hoje!</span>';
-        else if(dias<=3)badge=`<span class="badge ba" style="font-size:10px">${dias}d</span>`;
+    if(empty)empty.style.display='none';
+    tbody.innerHTML=ordenados.map((it,rowIdx)=>{
+      const dias=it.vencDia-dh;
+      let alerta='';
+      if(!it.pago){
+        if(dias<0)       alerta=`<span style="display:inline-block;padding:1px 7px;border-radius:99px;font-size:10px;background:var(--c5bg);color:var(--c5);font-weight:500;margin-left:5px">Vencida</span>`;
+        else if(dias===0) alerta=`<span style="display:inline-block;padding:1px 7px;border-radius:99px;font-size:10px;background:var(--c5bg);color:var(--c5);font-weight:500;margin-left:5px">Hoje!</span>`;
+        else if(dias<=3)  alerta=`<span style="display:inline-block;padding:1px 7px;border-radius:99px;font-size:10px;background:var(--c4bg);color:var(--c4);font-weight:500;margin-left:5px">${dias}d</span>`;
       }
-      return`<div class="item">
-        <div style="width:7px;height:7px;border-radius:50%;background:${parc.pago?'var(--c2)':'var(--c3)'};flex-shrink:0;margin-top:2px"></div>
-        <div class="im">
-          <div class="in" style="display:flex;align-items:center;gap:6px">${p.desc} ${badge}</div>
-          <div class="is">Parcela ${parc.idx}/${p.n} · ${parc.date}</div>
-        </div>
-        <span style="font-size:13px;font-weight:500;margin-right:8px;white-space:nowrap;${parc.pago?'color:var(--text3);text-decoration:line-through':''}">${fmt(p.parcVal)}</span>
-        ${!parc.pago?`<button class="pbtn" onclick="pagarParcelaVG('${p.id}','${parc.idx}')">Pagar</button>`:'<span class="badge bg">✓</span>'}
-      </div>`;
+      const rowBg=it.pago?'background:var(--surface2)':rowIdx%2===0?'':'background:var(--surface2)';
+      const riscado=it.pago?'text-decoration:line-through;color:var(--text3)':'';
+      const dotColor=it.pago?'var(--c2)':dias<0?'var(--c5)':dias<=3?'var(--c4)':'var(--border2)';
+      const fontWeight=it.pago?'400':'500';
+      return`<tr style="${rowBg};border-bottom:1px solid var(--border)">
+        <td style="padding:12px 14px">
+          <div style="display:flex;align-items:center;gap:7px">
+            <div style="width:8px;height:8px;border-radius:50%;background:${dotColor};flex-shrink:0"></div>
+            <span style="font-weight:${fontWeight};${riscado}">${it.desc}</span>${alerta}
+          </div>
+        </td>
+        <td style="padding:12px 10px;text-align:center;white-space:nowrap;font-size:13px;${riscado}">
+          ${it.venc.slice(8,10)}/${it.venc.slice(5,7)}
+        </td>
+        <td style="padding:12px 10px">
+          <span style="padding:2px 8px;border-radius:99px;font-size:11px;background:var(--surface2);color:var(--text2);white-space:nowrap">${it.cat}</span>
+        </td>
+        <td style="padding:12px 14px;text-align:right;font-weight:500;white-space:nowrap;${riscado}">
+          ${fmt(it.val)}
+        </td>
+        <td style="padding:12px 10px;text-align:center">
+          ${it.pago
+            ? `<i class="ti ti-circle-check" style="font-size:18px;color:var(--c2)"></i>`
+            : `<button class="pbtn" style="font-size:12px;padding:5px 10px" onclick="pagarItemVG('${it.id}')">Pagar</button>`
+          }
+        </td>
+      </tr>`;
     }).join('');
   }
 
-  // ÚLTIMAS MOVIMENTAÇÕES
-  const elM=document.getElementById('vg-movs');
-  const recentes=[...TR].sort((a,b)=>b.date.localeCompare(a.date)).slice(0,8);
-  if(!recentes.length){
-    elM.innerHTML='<div class="empty" style="padding:16px"><p>Nenhuma movimentação</p></div>';
-  } else {
-    elM.innerHTML=recentes.map(t=>`<div class="item">
-      <div style="width:7px;height:7px;border-radius:50%;background:${t.type==='income'?'var(--c2)':'var(--c5)'};flex-shrink:0;margin-top:2px"></div>
-      <div class="im">
-        <div class="in">${t.desc}</div>
-        <div class="is">${t.date} · ${t.cat}</div>
-      </div>
-      <span class="badge ${t.type==='income'?'bg':'br'}">${t.type==='income'?'+':'-'}${fmt(t.val)}</span>
-    </div>`).join('');
+  // MOVIMENTAÇÕES RECENTES
+  const recentes=[...TR].sort((a,b)=>b.date.localeCompare(a.date)).slice(0,10);
+  const movTbody=document.getElementById('vg-mov-tbody');
+  const movEmpty=document.getElementById('vg-mov-empty');
+  if(movTbody){
+    if(!recentes.length){
+      movTbody.innerHTML='';
+      if(movEmpty)movEmpty.style.display='block';
+    } else {
+      if(movEmpty)movEmpty.style.display='none';
+      movTbody.innerHTML=recentes.map((t,i)=>{
+        const rb=i%2===0?'':'background:var(--surface2)';
+        return`<tr style="${rb};border-bottom:1px solid var(--border)">
+          <td style="padding:10px 14px">
+            <div style="font-weight:500;font-size:13px">${t.desc}</div>
+            <div style="font-size:11px;color:var(--text2);margin-top:1px">${t.cat}${t.who?' · '+t.who:''}</div>
+          </td>
+          <td style="padding:10px 10px;text-align:center;white-space:nowrap;font-size:12px;color:var(--text2)">${t.date.slice(8,10)}/${t.date.slice(5,7)}</td>
+          <td style="padding:10px 14px;text-align:right;font-weight:500;white-space:nowrap">
+            <span style="color:${t.type==='income'?'var(--c2)':'var(--c5)'}">${t.type==='income'?'+':'-'}${fmt(t.val)}</span>
+          </td>
+        </tr>`;
+      }).join('');
+    }
   }
 }
 
-function togPagoVG(id){
-  const mk=new Date().toISOString().slice(0,7);
-  const c=CF.find(x=>x.id===id);
-  if(!c)return;
-  if(!c.pago)c.pago={};
-  c.pago[mk]=!c.pago[mk];
-  save();renderVG();
-}
-
-function pagarParcelaVG(pcId,idx){
-  const p=PC.find(x=>x.id===pcId);
-  if(!p)return;
-  const parc=p.parcelas.find(x=>x.idx===parseInt(idx));
-  if(!parc)return;
-  parc.pago=true;
-  TR.push({id:uid(),desc:`[Parcela ${parc.idx}/${p.n}] ${p.desc}`,val:p.parcVal,type:'expense',cat:p.cat,who:'casa',date:parc.date});
-  save();savePC();renderVG();
-}
+function togPagoVG(id){pagarItemVG('cf_'+id);}
+function pagarParcelaVG(pcId,idx){pagarItemVG('pc_'+pcId+'_'+idx);}
 
 const renders={financeiro:()=>{buildCatSelect('fin-cat');ftab(4);},compras:renderSH,agenda:renderAgenda,recados:renderRecados,metas:renderMetas};
 
